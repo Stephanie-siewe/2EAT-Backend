@@ -45,7 +45,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
         def create(self, validated_data):
             profile = validated_data.pop('profile_image', None)
-            print ('Profile image type',profile)
+            print('Profile image type',profile)
 
             # if profile == None :
             #     profile = create_default_profile_image()
@@ -55,8 +55,8 @@ class CustomUserSerializer(serializers.ModelSerializer):
                 username=validated_data['username'],
                 email=validated_data['email'],
                 password=validated_data['password'],
-                profile_image=validated_data.get('profile_image')
-                # profile_image=profile
+                profile_image=validated_data.get('profile_image'),
+                phone_number=validated_data.get('phone_number')
             )
             return user
 
@@ -71,6 +71,7 @@ class UserChangeProfileImage(serializers.Serializer):
 
 #Change Infos User Serializer
 class UserChangeInfos(serializers.Serializer):
+    phone_number = serializers.CharField(max_length=9)
     username = serializers.CharField()
     email = serializers.EmailField()
     id = serializers.CharField()

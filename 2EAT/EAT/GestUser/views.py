@@ -127,12 +127,12 @@ class UserChangeProfileImage(APIView):
     serializer_class = UserChangeProfileImage
     def post(self,request):
 
-            username = request.data.get('username')
+            id = request.data.get('id')
             profile_image = request.data.get('profile_image')
             print('profile',profile_image)
 
             try:
-                user = CustomUser.objects.get(username=username)
+                user = CustomUser.objects.get(id=id)
                 # binary_image = base64.b64decode(profile_image)
                 binary_image = profile_image.read()
                 user.profile_image = binary_image
@@ -153,6 +153,7 @@ class UserChangeInformation(APIView):
         id_user = request.data.get("id")
         email = request.data.get("email")
         username = request.data.get("username")
+        phone_number = request.data.get("phone_number")
 
         if id_user==None :
             content = {'error': 'Any id sent'}
@@ -184,7 +185,7 @@ class UserChangeInformation(APIView):
 
         try:
             user = CustomUser.objects.get(id=id_user)
-
+            user.phone_number = phone_number
             user.username = username
             user.email = email
             user.save()

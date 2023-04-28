@@ -5,7 +5,9 @@ from django.contrib.auth.models import AbstractUser, Group, Permission
 
 
 class CustomUser(AbstractUser):
+    app_label = 'GestUser'
     profile_image = models.BinaryField(blank=True, null=True)
+    phone_number = models.CharField(max_length=11, blank=True, null=True)
 
     groups = models.ManyToManyField(
         Group,

@@ -118,12 +118,10 @@ class PlaceCreate(APIView):
            return Response(content, status=status.HTTP_406_NOT_ACCEPTABLE)
 
 
-
-
-
 class PlaceViewSet(viewsets.ModelViewSet):
-    queryset = Place.objects.all()
+    queryset = Place.objects.select_related().all()
     serializer_class = PlaceSerializerList
+
 
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
@@ -133,15 +131,3 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
 
 
-class CategoryListAPIview(ListAPIView):
-    serializer_class = CategorySerializer
-
-    def get_queryset(self):
-        queryset  = Category.objects.all()
-        print('querysetList',queryset)
-        return queryset
-
-    def get(self, request, *args, **kwargs):
-        queryset =self.get_queryset()
-        serializer = self.get_serializer(queryset,many=True)
-        return Response(serializer.data)

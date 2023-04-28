@@ -9,5 +9,5 @@ router.register('view', PlaceViewSet)
 router.register('categorie', CategoryViewSet)
 urlpatterns = [
 path('add', PlaceCreate.as_view())
-# path('listP',CategoryListAPIview.as_view())
+
 ]+router.urls

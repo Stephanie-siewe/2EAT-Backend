@@ -1,13 +1,13 @@
 from rest_framework import serializers
 from .models import *
+from GestUser.serializers import  CustomUserSerializer
 
-
-class CategorySerializer(serializers.Serializer):
+class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ('__all__')
 
-class LocalisationSerializer(serializers.Serializer):
+class LocalisationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Localisation
         fields = ['id','city','quarter','longitude','latitude']
@@ -16,10 +16,15 @@ class LocalisationSerializer(serializers.Serializer):
         def create(self,validated_data):
             return Localisation.objects.create(**validated_data)
 
-class PlaceSerializerList(serializers.Serializer):
+class PlaceSerializerList(serializers.ModelSerializer):
+    localisation = LocalisationSerializer()
+    category = CategorySerializer()
+    user = CustomUserSerializer()
+
+
     class Meta:
         model = Place
-        fields = ['id', 'category_id', 'localisation_id', 'user_id', 'order', 'name', 'description', 'picture']
+        fields = ['id', 'category', 'localisation', 'user', 'order', 'name', 'description', 'picture']
         # fields = ('__all__')
 
 class PlaceSerializer(serializers.Serializer):
@@ -34,6 +39,10 @@ class PlaceSerializer(serializers.Serializer):
    longitude = serializers.CharField(max_length=35)
    latitude = serializers.CharField(max_length=35)
 
+
+
+class DishSerializer(serializers.ModelSerializer):
+    pass
 
 
 

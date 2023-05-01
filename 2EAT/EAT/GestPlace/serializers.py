@@ -25,7 +25,7 @@ class PlaceSerializerList(serializers.ModelSerializer):
     class Meta:
         model = Place
         fields = ['id', 'category', 'localisation', 'user', 'order', 'name', 'description', 'picture']
-        # fields = ('__all__')
+        extra_kwargs = {'category': {'read_only': True}, 'user': {'read_only': True}, 'localisation': {'read_only': True}}
 
 class PlaceSerializer(serializers.Serializer):
    user_id = serializers.CharField(max_length=50)
@@ -42,14 +42,31 @@ class PlaceSerializer(serializers.Serializer):
 
 
 class DishSerializer(serializers.ModelSerializer):
-    pass
+    place = PlaceSerializerList()
+
+    class Meta:
+        model = Dish
+        fields = '__all__'
+        extra_kwargs = {'place': {'read_only': True}}
+
+
+class DishCreateSerializer(serializers.Serializer):
+    place = serializers.CharField(max_length=20)
+    price = serializers.FloatField(default=0)
+    name = serializers.CharField(max_length=40)
+    # specifity = serializers.JSONField()
+    picture = serializers.ImageField()
+
+
+
+class ConstituentCreateSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=50)
+    dish = serializers.CharField(max_length=30)
+    price_u = serializers.FloatField(default=0)
 
 
 
 
-
-
-
-
-
-
+class ModifyPictureSerializer(serializers.Serializer):
+    picture = serializers.ImageField()
+    object_id = serializers.CharField()

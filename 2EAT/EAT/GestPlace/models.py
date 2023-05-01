@@ -30,8 +30,8 @@ class Place(models.Model):
 class Dish(models.Model):
     name = models.CharField(max_length=50)
     picture = models.BinaryField(blank=True, null=True)
-    price = models.FloatField()
-    specifity = models.JSONField()
+    price = models.FloatField(default=0)
+    # specifity = models.JSONField()
     place = models.ForeignKey(Place,on_delete=models.CASCADE)
 
 

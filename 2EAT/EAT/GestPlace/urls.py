@@ -16,5 +16,6 @@ path('update/place', ModifyPlaceInformations.as_view()),
 path('update/consti', ModifyConstituent.as_view()),
 path('update/dish/', ModifyDish.as_view()),
 path('update/place/photo', ModifyPicturePlace.as_view()),
-path('update/dish/photo', ModifyPictureDish.as_view())
+path('update/dish/photo', ModifyPictureDish.as_view()),
+path('searchbylocal/<str:long>/<str:lati>', SearchPlaceByLocalisation.as_view())
 ]+router.urls

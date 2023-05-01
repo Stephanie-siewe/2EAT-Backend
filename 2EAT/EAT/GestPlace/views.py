@@ -1,3 +1,7 @@
+import json
+import math
+from operator import itemgetter
+
 from django.http import JsonResponse
 from django.shortcuts import render
 
@@ -455,6 +459,43 @@ class ModifyConstituent(APIView):
             return Response(content, status=status.HTTP_406_NOT_ACCEPTABLE)
 
 
+
+#calculation of the geodesic distance between 2 points
+def distance(lat1, lon1, lat2, lon2):
+    r = 6371  # rayon moyen de la Terre en kilomètres
+
+    # conversion des latitudes et longitudes en radians
+    lat1, lon1, lat2, lon2 = map(math.radians, [lat1, lon1, lat2, lon2])
+
+    # calcul de la distance
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+    a = math.sin(dlat/2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon/2)**2
+    c = 2 * math.asin(math.sqrt(a))
+    d = r * c
+
+    return d
+
+
+class SearchPlaceByLocalisation(APIView):
+
+    def get(self, request, long, lati):
+        userLongitude = float(long)
+        userLatitude  = float(lati)
+        nearPlace = []
+
+        places = Place.objects.select_related().all()
+
+        for place in places:
+
+            dist = distance(userLatitude, userLongitude, place.localisation.latitude, place.localisation.longitude)
+            dico = {"place_id": place.id, "distance": dist}
+            nearPlace.append(dico)
+
+        response = sorted(nearPlace, key=itemgetter('distance'))
+        print('response', response)
+        content = {"response": response}
+        return Response(content,  status=status.HTTP_200_OK)
 
 
 

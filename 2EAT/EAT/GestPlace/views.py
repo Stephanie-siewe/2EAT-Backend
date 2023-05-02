@@ -6,8 +6,8 @@ from django.http import JsonResponse
 from django.shortcuts import render
 
 from rest_framework import status, viewsets, generics
-from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView
-from rest_framework.permissions import AllowAny
+from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView, get_object_or_404
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import *
@@ -517,9 +517,44 @@ class CommentsDetail(generics.RetrieveAPIView):
 
 
 
+class CommentLikeToggle(APIView):
+    queryset = Comments.objects.all()
+    serializer_class = CommentLikeSerializer
 
+    def get(self, request, pk,userid, *args, **kwargs):
+        # print('pk',pk)
+        try:
 
+            comment = Comments.objects.get(id=pk)
+            user = CustomUser.objects.get(id=userid)
+            comment_like, created = CommentLike.objects.get_or_create(user=user, comment=comment)
+            if not created:
+                comment_like.delete()
 
+                likes_count = CommentLike.objects.filter(comment=pk).count()
+                content = {"message": "Like removed", "likes": likes_count}
+                return Response(content, status=status.HTTP_204_NO_CONTENT)
+            likes_count = CommentLike.objects.filter(comment=pk).count()
+            content = {"message": "like added", "likes": likes_count}
+
+            return Response(content, status=status.HTTP_201_CREATED)
+        except:
+            content = {"error":"Comment or User does not exists"}
+            return Response(content, status=status.HTTP_406_NOT_ACCEPTABLE)
+
+# class CommentLikesCount(generics.RetrieveAPIView):
+#     queryset = Comments.objects.all()
+#
+#     def get(self,request, pk, *args, **kwargs):
+#         try:
+#             comment = Comments.objects.get(id=pk)
+#             likes_count = CommentLike.objects.filter(comment=pk).count()
+#             return Response({"likes": likes_count}, status=status.HTTP_200_OK)
+#         except Exception as e:
+#             print("exception:", e)
+#             content = {"error": "Comment does not exists"}
+#             return Response(content, status=status.HTTP_406_NOT_ACCEPTABLE)
+#
 
 
 

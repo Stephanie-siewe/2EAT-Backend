@@ -20,5 +20,6 @@ path('update/dish/photo', ModifyPictureDish.as_view()),
 path('searchbylocal/<str:long>/<str:lati>', SearchPlaceByLocalisation.as_view()),
 path('add/comment', CommentCreate.as_view()),
 path('comments', CommentsList.as_view()),
-path('comments/<int:id>', CommentsDetail.as_view())
+path('comments/<int:id>', CommentsDetail.as_view()),
+path('comments/<int:pk>/<int:userid>/like', CommentLikeToggle.as_view())
 ]+router.urls

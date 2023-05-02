@@ -50,13 +50,13 @@ class Comments(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=True)
 
-# class ratingPlace(models.Model):
-#     user = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True)
-#     voteUser = models.IntegerField(default=0)
-#     place = models.ForeignKey(Place, on_delete=models.CASCADE)
-#     total = models.FloatField(default=0)
-#
-#
 
+class CommentLike(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True)
+    comment =models.ForeignKey(Comments, on_delete=models.CASCADE)
+    is_like = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f'{self.user} {self.comment} {self.is_like}'
 
 

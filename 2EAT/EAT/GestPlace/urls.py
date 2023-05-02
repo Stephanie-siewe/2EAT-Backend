@@ -23,5 +23,9 @@ path('comments', CommentsList.as_view()),
 path('comments/<int:id>', CommentsDetail.as_view()),
 path('comments/<int:pk>/<int:userid>/like', CommentLikeToggle.as_view()),
 path('comments/<int:pk>/likes-count', CommentLikesCount.as_view()),
-path('noteplace/<int:userid>/<int:pk>/<int:note>', NotePlace.as_view())
+path('noteplace/<int:userid>/<int:pk>/<int:note>', NotePlace.as_view()),
+
+path('delete/place/<int:pk>', PlaceDelete.as_view()),
+path('delete/dish/<int:pk>', DishDelete.as_view()),
+path('delete/consti/<int:pk>', ConstituentDishDelete.as_view())
 ]+router.urls

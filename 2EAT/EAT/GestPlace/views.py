@@ -590,3 +590,15 @@ class NotePlace(APIView):
 
 
 
+class PlaceDelete(generics.DestroyAPIView):
+    queryset = Place.objects.all()
+    serializer_class = PlaceSerializerList
+
+class DishDelete(generics.DestroyAPIView):
+    queryset = Dish.objects.all()
+    serializer_class = DishSerializer
+
+class ConstituentDishDelete(generics.DestroyAPIView):
+    queryset = ConstituentDish.objects.all()
+    serializer_class = ConstituentSerializer
+

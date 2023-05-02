@@ -65,7 +65,11 @@ class ConstituentCreateSerializer(serializers.Serializer):
     price_u = serializers.FloatField(default=0)
 
 
+class ConstituentSerializer(serializers.ModelSerializer):
 
+    class Meta:
+        model = ConstituentDish
+        fields = "__all__"
 
 class ModifyPictureSerializer(serializers.Serializer):
     picture = serializers.ImageField()

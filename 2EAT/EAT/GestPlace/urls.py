@@ -21,5 +21,7 @@ path('searchbylocal/<str:long>/<str:lati>', SearchPlaceByLocalisation.as_view())
 path('add/comment', CommentCreate.as_view()),
 path('comments', CommentsList.as_view()),
 path('comments/<int:id>', CommentsDetail.as_view()),
-path('comments/<int:pk>/<int:userid>/like', CommentLikeToggle.as_view())
+path('comments/<int:pk>/<int:userid>/like', CommentLikeToggle.as_view()),
+path('comments/<int:pk>/likes-count', CommentLikesCount.as_view()),
+path('noteplace/<int:userid>/<int:pk>/<int:note>', NotePlace.as_view())
 ]+router.urls

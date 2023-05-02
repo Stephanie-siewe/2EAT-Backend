@@ -1,3 +1,4 @@
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from GestUser.models import CustomUser
 # Create your models here.
@@ -60,3 +61,7 @@ class CommentLike(models.Model):
         return f'{self.user} {self.comment} {self.is_like}'
 
 
+class PlaceNote(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True)
+    place = models.ForeignKey(Place, on_delete=models.CASCADE)
+    note = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(5)], default=0)

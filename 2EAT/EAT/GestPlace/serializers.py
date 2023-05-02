@@ -87,8 +87,16 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class CommentLikeSerializer(serializers.ModelSerializer):
 
-    #user = serializers.PrimaryKeyRelatedField(read_only=True)
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
         model = CommentLike
+        fields = '__all__'
+
+
+class PlaceNoteSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
+
+    class Meta:
+        model = PlaceNote
         fields = '__all__'

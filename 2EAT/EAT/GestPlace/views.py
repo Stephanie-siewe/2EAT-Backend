@@ -1,13 +1,11 @@
 import json
 import math
 from operator import itemgetter
+from statistics import mean
 
-from django.http import JsonResponse
-from django.shortcuts import render
+
 
 from rest_framework import status, viewsets, generics
-from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView, get_object_or_404
-from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import *
@@ -500,7 +498,7 @@ class SearchPlaceByLocalisation(APIView):
 
 
 class CommentCreate(APIView):
-    def post(self,request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         serializer = CommentSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -539,27 +537,56 @@ class CommentLikeToggle(APIView):
 
             return Response(content, status=status.HTTP_201_CREATED)
         except:
-            content = {"error":"Comment or User does not exists"}
+            content = {"error": "Comment or User does not exists"}
             return Response(content, status=status.HTTP_406_NOT_ACCEPTABLE)
 
-# class CommentLikesCount(generics.RetrieveAPIView):
-#     queryset = Comments.objects.all()
-#
-#     def get(self,request, pk, *args, **kwargs):
-#         try:
-#             comment = Comments.objects.get(id=pk)
-#             likes_count = CommentLike.objects.filter(comment=pk).count()
-#             return Response({"likes": likes_count}, status=status.HTTP_200_OK)
-#         except Exception as e:
-#             print("exception:", e)
-#             content = {"error": "Comment does not exists"}
-#             return Response(content, status=status.HTTP_406_NOT_ACCEPTABLE)
-#
+class CommentLikesCount(generics.RetrieveAPIView):
+    queryset = Comments.objects.all()
+
+    def get(self, request, pk, *args, **kwargs):
+        try:
+            comment = Comments.objects.get(id=pk)
+            likes_count = CommentLike.objects.filter(comment=pk).count()
+            return Response({"likes": likes_count}, status=status.HTTP_200_OK)
+        except Exception as e:
+            print("exception:", e)
+            content = {"error": "Comment does not exists"}
+            return Response(content, status=status.HTTP_406_NOT_ACCEPTABLE)
 
 
 
 
+class NotePlace(APIView):
+    # queryset = PlaceNote.objects.all()
 
+    def get(self, request, userid, pk, note, *args, **kwargs):
+        try:
+            user = CustomUser.objects.get(id=userid)
+            place = Place.objects.get(id=pk)
+
+            if note>=0 and note<6:
+                note_place, created = PlaceNote.objects.get_or_create(user=user, place=place)
+                if note != note_place.note:
+                    note_place.note = note
+                    note_place.save()
+
+                notes = []
+                queryset = PlaceNote.objects.filter(place=pk)
+                for i in queryset:
+                    notes.append(i.note)
+                moy = mean(notes)
+                content = {"success": "note changed", "moy": moy}
+                return Response(content, status=status.HTTP_200_OK)
+
+
+            else:
+                content = {"error":"this note is not valid"}
+                return Response(content,status=status.HTTP_406_NOT_ACCEPTABLE)
+
+        except Exception as e:
+            print('error',e)
+            content = {"error": "this user or this place does not exists"}
+            return Response(content, status=status.HTTP_406_NOT_ACCEPTABLE)
 
 
 

@@ -70,3 +70,15 @@ class ConstituentCreateSerializer(serializers.Serializer):
 class ModifyPictureSerializer(serializers.Serializer):
     picture = serializers.ImageField()
     object_id = serializers.CharField()
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    replies = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Comments
+        fields = '__all__'
+    def get_replies(self,obj):
+        if obj.replies.exists():
+            return CommentSerializer(obj.replies.all(), many=True).data
+        return None

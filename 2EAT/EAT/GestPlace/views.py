@@ -5,7 +5,7 @@ from operator import itemgetter
 from django.http import JsonResponse
 from django.shortcuts import render
 
-from rest_framework import status, viewsets
+from rest_framework import status, viewsets, generics
 from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -496,6 +496,29 @@ class SearchPlaceByLocalisation(APIView):
         print('response', response)
         content = {"response": response}
         return Response(content,  status=status.HTTP_200_OK)
+
+
+
+class CommentCreate(APIView):
+    def post(self,request, *args, **kwargs):
+        serializer = CommentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class CommentsList(generics.ListCreateAPIView):
+    queryset = Comments.objects.filter(parent__isnull=True)
+    serializer_class = CommentSerializer
+
+class CommentsDetail(generics.RetrieveAPIView):
+    queryset = Comments.objects.all()
+    serializer_class = CommentSerializer
+    lookup_field = 'id'
+
+
+
+
+
 
 
 

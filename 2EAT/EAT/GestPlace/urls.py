@@ -17,5 +17,8 @@ path('update/consti', ModifyConstituent.as_view()),
 path('update/dish/', ModifyDish.as_view()),
 path('update/place/photo', ModifyPicturePlace.as_view()),
 path('update/dish/photo', ModifyPictureDish.as_view()),
-path('searchbylocal/<str:long>/<str:lati>', SearchPlaceByLocalisation.as_view())
+path('searchbylocal/<str:long>/<str:lati>', SearchPlaceByLocalisation.as_view()),
+path('add/comment', CommentCreate.as_view()),
+path('comments', CommentsList.as_view()),
+path('comments/<int:id>', CommentsDetail.as_view())
 ]+router.urls

@@ -42,3 +42,21 @@ class ConstituentDish(models.Model):
 
 
 
+class Comments(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True)
+    place = models.ForeignKey(Place, on_delete=models.CASCADE)
+    body = models.TextField(max_length=200)
+    parent = models.ForeignKey('self',  on_delete=models.CASCADE, blank=True, null=True, related_name='replies')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now_add=True)
+
+# class ratingPlace(models.Model):
+#     user = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True)
+#     voteUser = models.IntegerField(default=0)
+#     place = models.ForeignKey(Place, on_delete=models.CASCADE)
+#     total = models.FloatField(default=0)
+#
+#
+
+
+

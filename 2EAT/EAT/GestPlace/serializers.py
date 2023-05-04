@@ -66,11 +66,11 @@ class ConstituentCreateSerializer(serializers.Serializer):
 
 
 class ConstituentSerializer(serializers.ModelSerializer):
-
+    dish = DishSerializer()
     class Meta:
         model = ConstituentDish
         fields = "__all__"
-
+        extra_kwargs = {'dish': {'read_only': True}}
 class ModifyPictureSerializer(serializers.Serializer):
     picture = serializers.ImageField()
     object_id = serializers.CharField()
@@ -103,4 +103,20 @@ class PlaceNoteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PlaceNote
+        fields = '__all__'
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    # user = CustomUserSerializer()
+    # dish = DishSerializer()
+    class Meta:
+        model = Order
+        fields = '__all__'
+
+
+class DishOrder(serializers.ModelSerializer):
+    order = OrderSerializer()
+
+    class Meta:
+        model = DishOrder
         fields = '__all__'

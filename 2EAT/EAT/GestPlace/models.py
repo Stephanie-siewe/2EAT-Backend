@@ -65,3 +65,18 @@ class PlaceNote(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True)
     place = models.ForeignKey(Place, on_delete=models.CASCADE)
     note = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(5)], default=0)
+
+
+class Order(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    status = models.CharField(choices=(('En cours', 'En cours'), ("Livre", "Livre"), ('Annule', 'Annule')), max_length=9)
+    created_at = models.DateTimeField(auto_now_add=True)
+    update_at = models.DateTimeField(auto_now_add=True)
+    dish = models.ForeignKey(Dish, on_delete=models.SET_NULL, null=True)
+    price = models.FloatField(default=0)
+
+
+class DishOrder(models.Model):
+    constituent = models.ForeignKey(ConstituentDish, on_delete=models.SET_NULL, null=True)
+    qte = models.IntegerField(default=0)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)

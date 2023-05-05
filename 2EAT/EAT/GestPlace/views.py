@@ -4,6 +4,7 @@ from operator import itemgetter
 from statistics import mean
 
 from rest_framework import status, viewsets, generics
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import *
@@ -658,6 +659,35 @@ class OrderDelete(generics.DestroyAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
     lookup_field = 'pk'
+
+
+
+
+class GetPlacesByCategoryId(generics.ListAPIView):
+    serializer_class = PlaceSerializerList
+
+    def get_queryset(self):
+        id = self.kwargs['id']
+        queryset = Place.objects.filter(category__id=id)
+        return queryset
+
+
+class GetDishesByPlaceId(generics.ListAPIView):
+    serializer_class = DishSerializer
+
+    def get_queryset(self):
+        id = self.kwargs['id']
+        queryset = Dish.objects.filter(place__id=id)
+        return queryset
+
+
+class GetConstituentByDishId(generics.ListAPIView):
+    serializer_class = ConstituentSerializer
+
+    def get_queryset(self):
+        id = self.kwargs['id']
+        queryset = ConstituentDish.objects.filter(dish__id=id)
+        return queryset
 
 
 class DishOrderAPIView(APIView):

@@ -592,6 +592,23 @@ class NotePlace(APIView):
             return Response(content, status=status.HTTP_406_NOT_ACCEPTABLE)
 
 
+class ListNotePlace(APIView):
+    queryset = Place.objects.all()
+
+    def get(self, request):
+        note = []
+        for i in self.queryset:
+            query = PlaceNote.objects.fiter(id=i.id)
+            if len(query) == 0:
+                moy_note = 0
+            else:
+                moy_note = sum(obj.note for obj in query)/len(query)
+            infos = {"id":i.id, "name":i.name, "moy":moy_note, "quarter":i.localisation.quarter, "city":i.localisation.city}
+
+            note.append(infos)
+
+        return Response(sorted(note, key=itemgetter('moy')))
+
 
 class PlaceDelete(generics.DestroyAPIView):
     queryset = Place.objects.all()

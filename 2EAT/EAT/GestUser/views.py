@@ -1,7 +1,11 @@
+from datetime import datetime, timedelta
+
+from django.utils import timezone
 from rest_framework.authtoken.models import Token
 
 from django.shortcuts import render
 from rest_framework import generics, status, viewsets
+from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.contrib.auth import authenticate
@@ -102,6 +106,15 @@ class UserLoginView(APIView):
             return Response(content, status=status.HTTP_404_NOT_FOUND)
 
 
+@api_view(['POST'])
+def VerifyTokenValidity(request):
+    tok = request.data.get('token')
+    token = Token.objects.get(key=tok)
+    duration = timedelta(seconds=settings.REST_FRAMEWORK.TOKEN_EXPIRATION_SECONDS)
+    expiration_date = token.created + duration
+    is_expired = expiration_date <= timezone.now()
+    return is_expired
+
 #Api view for Logout
 class UserLogOutView(APIView):
     permission_classes = [IsAuthenticated]
@@ -134,7 +147,14 @@ class UserChangeProfileImage(APIView):
             try:
                 user = CustomUser.objects.get(id=id)
                 # binary_image = base64.b64decode(profile_image)
-                binary_image = profile_image.read()
+                if isinstance(profile_image, str):
+                    binary_image = profile_image
+
+                else:
+                    binary_image = profile_image.read()
+                    print('binary', binary_image)
+                    print('type 1', type(binary_image))
+                    print('type 2', type(base64.b64decode(binary_image)))
                 user.profile_image = binary_image
                 user.save()
                 content = {'success': 'Profile image updated'}

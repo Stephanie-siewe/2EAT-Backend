@@ -5,6 +5,7 @@ from .views import *
 router = SimpleRouter()
 router.register('users', UserViewSet, 'users')
 urlpatterns = [
+path('validity', VerifyTokenValidity),
 path('registration', UserCreate.as_view()),
 path('login', UserLoginView.as_view()),
 path('logout',UserLogOutView.as_view()),

@@ -147,7 +147,7 @@ class UserChangeProfileImage(APIView):
             try:
                 user = CustomUser.objects.get(id=id)
                 # binary_image = base64.b64decode(profile_image)
-                if isinstance(profile_image, str):
+                if isinstance(profile_image, bytes):
                     binary_image = profile_image
 
                 else:

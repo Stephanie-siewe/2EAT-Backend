@@ -50,7 +50,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.AllowAny'],
     'DEFAULT_AUTHENTICATION_CLASSES':['rest_framework.authentication.TokenAuthentication'],
     'DEFAULT_SETTINGS': {
-        'TOKENSE_EXPIRE_AFTER_SECONDS': 604800,  # 7jours
+        'TOKENSE_EXPIRE_AFTER_SECONDS': 604800,  # 30jours
     }
 }
 

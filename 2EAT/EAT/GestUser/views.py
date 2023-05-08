@@ -1,5 +1,7 @@
+import re
 from datetime import datetime, timedelta
 
+import pytz
 from django.utils import timezone
 from rest_framework.authtoken.models import Token
 
@@ -18,6 +20,9 @@ import base64
 User=CustomUser
 
 
+def validate_email(email):
+    regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    return re.match(regex, email) is not None
 #Api view for user creation
 class UserCreate(generics.CreateAPIView):
     serializer_class = CustomUserSerializer
@@ -97,7 +102,7 @@ class UserLoginView(APIView):
             if rep:
                 #create or get the token of the user
                 token,created = Token.objects.get_or_create(user=user)
-                return Response({'token': token.key}, status=status.HTTP_200_OK)
+                return Response({'token': token.key,'user_id':user.id}, status=status.HTTP_200_OK)
             else:
                 content = {'error': 'Invalid password.'}
                 return Response(content, status=status.HTTP_401_UNAUTHORIZED)
@@ -110,10 +115,14 @@ class UserLoginView(APIView):
 def VerifyTokenValidity(request):
     tok = request.data.get('token')
     token = Token.objects.get(key=tok)
-    duration = timedelta(seconds=settings.REST_FRAMEWORK.TOKEN_EXPIRATION_SECONDS)
-    expiration_date = token.created + duration
-    is_expired = expiration_date <= timezone.now()
-    return is_expired
+    print('token', token)
+    dat = datetime.now()
+    date_actual_with_timezone = dat.replace(tzinfo=pytz.UTC)
+    if date_actual_with_timezone - token.created > timedelta(days=30):
+        is_expired = True
+    else:
+        is_expired = False
+    return Response(is_expired)
 
 #Api view for Logout
 class UserLogOutView(APIView):
@@ -175,13 +184,24 @@ class UserChangeInformation(APIView):
         username = request.data.get("username")
         phone_number = request.data.get("phone_number")
 
+        print('username',username)
+        print('typeofusername', type(username))
+        print('email', email)
         if id_user==None :
             content = {'error': 'Any id sent'}
             return Response(content, status=status.HTTP_404_NOT_FOUND)
 
-        if email==None or username==None:
-            content = {'error': 'No content username or email'}
+        if username==None or username =='':
+            content = {'error': 'Username is required'}
             return Response(content, status=status.HTTP_406_NOT_ACCEPTABLE)
+
+        if email == None or email == '':
+            content = {'error': 'Email is required'}
+            return Response(content, status=status.HTTP_406_NOT_ACCEPTABLE)
+        if validate_email(email) == False:
+            content = {'error': 'Email is not valid'}
+            return Response(content, status=status.HTTP_406_NOT_ACCEPTABLE)
+
         try:
             user = CustomUser.objects.get(email=email)
             if str(user.id) != id_user:

@@ -1,4 +1,4 @@
-
+import base64
 import math
 from operator import itemgetter
 from statistics import mean
@@ -96,7 +96,10 @@ class PlaceCreate(APIView):
                    return Response(content, status=status.HTTP_400_BAD_REQUEST)
 
            try:
-               binary_image = picture.read()
+               binr = picture.encode('utf-8')
+               binary_image = base64.b64decode(binr)
+
+               # binary_image = picture.read()
                place = Place()
                place.localisation = localisation
                place.name = name
@@ -237,10 +240,12 @@ class ModifyPicturePlace(APIView):
             content = {"error": "field id empty"}
             return Response(content, status=status.HTTP_406_NOT_ACCEPTABLE)
 
+        binr = picture.encode('utf-8')
+        binary_image = base64.b64decode(binr)
 
         if Place.objects.filter(id=place_id).exists() == True:
             place = Place.objects.filter(id=place_id)[0]
-            place.picture = picture.read()
+            place.picture = binary_image
             place.save()
             content = {"success": "Modified"}
             return Response(content, status=status.HTTP_202_ACCEPTED)
@@ -289,12 +294,13 @@ class DishCreate(APIView):
             content = {"error": "Please give a name of your dish"}
             return Response(content, status=status.HTTP_406_NOT_ACCEPTABLE)
 
-
+        binr = picture.encode('utf-8')
+        binary_image = base64.b64decode(binr)
         try:
             place_info = Place.objects.get(id=place)
             dish = Dish()
             dish.name = name
-            dish.picture = picture.read()
+            dish.picture = binary_image
             dish.place = place_info
             dish.price = price
 
@@ -365,11 +371,13 @@ class ModifyPictureDish(APIView):
         if not dish_id:
             content = {"error": "field id empty"}
             return Response(content, status=status.HTTP_406_NOT_ACCEPTABLE)
+        binr = picture.encode('utf-8')
+        binary_image = base64.b64decode(binr)
 
         if Dish.objects.filter(id=dish_id).exists() == True:
-            place = Place.objects.filter(id=dish_id)[0]
-            place.picture = picture.read()
-            place.save()
+            dish = Dish.objects.filter(id=dish_id)[0]
+            dish.picture = binary_image
+            dish.save()
             content = {"success": "Modified"}
             return Response(content, status=status.HTTP_202_ACCEPTED)
 

@@ -102,7 +102,7 @@ class UserLoginView(APIView):
             if rep:
                 #create or get the token of the user
                 token,created = Token.objects.get_or_create(user=user)
-                return Response({'token': token.key,'user_id':user.id}, status=status.HTTP_200_OK)
+                return Response({'token': token.key, 'user_id': user.id, 'username': user.username}, status=status.HTTP_200_OK)
             else:
                 content = {'error': 'Invalid password.'}
                 return Response(content, status=status.HTTP_401_UNAUTHORIZED)
@@ -152,18 +152,21 @@ class UserChangeProfileImage(APIView):
             id = request.data.get('id')
             profile_image = request.data.get('profile_image')
             print('profile',profile_image)
+            print('id', id)
 
             try:
                 user = CustomUser.objects.get(id=id)
                 # binary_image = base64.b64decode(profile_image)
-                if isinstance(profile_image, bytes):
-                    binary_image = profile_image
-
-                else:
-                    binary_image = profile_image.read()
-                    print('binary', binary_image)
-                    print('type 1', type(binary_image))
-                    print('type 2', type(base64.b64decode(binary_image)))
+                # if isinstance(profile_image, bytes):
+                #     binary_image = profile_image
+                #
+                # else:
+                #     binary_image = profile_image.read()
+                #     print('binary', binary_image)
+                #     print('type 1', type(binary_image))
+                #     print('type 2', type(base64.b64decode(binary_image)))
+                binr = profile_image.encode('utf-8')
+                binary_image = base64.b64decode(binr)
                 user.profile_image = binary_image
                 user.save()
                 content = {'success': 'Profile image updated'}

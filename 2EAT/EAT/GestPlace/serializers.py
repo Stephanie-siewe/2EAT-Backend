@@ -31,7 +31,7 @@ class PlaceSerializer(serializers.Serializer):
    user_id = serializers.CharField(max_length=50)
    name = serializers.CharField(max_length=50)
    order = serializers.BooleanField()
-   picture = serializers.ImageField()
+   picture = serializers.CharField(max_length=1000)
    description = serializers.CharField(max_length=255)
    category_id = serializers.CharField(max_length=20)
    city = serializers.CharField(max_length=50)
@@ -55,7 +55,7 @@ class DishCreateSerializer(serializers.Serializer):
     price = serializers.FloatField(default=0)
     name = serializers.CharField(max_length=40)
     # specifity = serializers.JSONField()
-    picture = serializers.ImageField()
+    picture = serializers.CharField(max_length=1000)
 
 
 
@@ -72,7 +72,7 @@ class ConstituentSerializer(serializers.ModelSerializer):
         fields = "__all__"
         extra_kwargs = {'dish': {'read_only': True}}
 class ModifyPictureSerializer(serializers.Serializer):
-    picture = serializers.ImageField()
+    picture = serializers.CharField(max_length=1000)
     object_id = serializers.CharField()
 
 

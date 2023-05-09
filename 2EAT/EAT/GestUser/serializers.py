@@ -66,7 +66,7 @@ class UserChangePassword(serializers.Serializer):
 
 #Change Profile image of user serializer
 class UserChangeProfileImage(serializers.Serializer):
-    profile_image = serializers.ImageField()
+    profile_image = serializers.CharField(max_length=1000)
     id = serializers.CharField()
 
 #Change Infos User Serializer

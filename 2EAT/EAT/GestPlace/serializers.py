@@ -107,16 +107,16 @@ class PlaceNoteSerializer(serializers.ModelSerializer):
 
 
 class OrderSerializer(serializers.ModelSerializer):
-    # user = CustomUserSerializer()
-    # dish = DishSerializer()
+    user = CustomUserSerializer()
+    dish = DishSerializer()
     class Meta:
         model = Order
         fields = '__all__'
 
 
-class DishOrder(serializers.ModelSerializer):
+class DishOrderSerializer(serializers.ModelSerializer):
     order = OrderSerializer()
-
+    constituent = ConstituentSerializer()
     class Meta:
         model = DishOrder
         fields = '__all__'

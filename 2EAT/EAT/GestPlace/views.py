@@ -1,10 +1,12 @@
 import base64
+import json
 import math
 from operator import itemgetter
 from statistics import mean
 
 from rest_framework import status, viewsets, generics
 from rest_framework.decorators import api_view
+from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import *
@@ -716,49 +718,135 @@ class GetConstituentByDishId(generics.ListAPIView):
         return queryset
 
 
-class DishOrderAPIView(APIView):
 
 
-    def post(self, request):
-        id_order = request.data.get('order')
-        id_consti = request.data.get('consti')
-        qte = request.data.get('qte')
+@api_view(['POST'])
+def AddOrder(request):
 
-        if not qte:
-          qte = 0
-        if not id_order:
-            content = {"error": "field order is empty"}
-            return Response(content, status=status.HTTP_406_NOT_ACCEPTABLE)
+    dish_id = request.data.get('dish')
+    user_id = request.data.get('user')
+    constituents = request.data.get('constituents')
+    print('constituents', constituents)
+    if not dish_id:
+        content = {"error": 'field Dish empty'}
+        return Response(content, status=status.HTTP_406_NOT_ACCEPTABLE)
 
-        if not id_consti:
-            content = {"error": "field consti empty"}
-            return Response(content, status=status.HTTP_406_NOT_ACCEPTABLE)
-        try:
-            order = Order.objects.get(id=id_order)
-            constit = ConstituentDish.objects.get(id=id_consti)
-            if constit.dish.id != order.dish.id:
+    if not user_id:
+        content = {"error": 'field User empty'}
+        return Response(content, status=status.HTTP_406_NOT_ACCEPTABLE)
 
-                content = {"error": "it is not a constituent of this dish"}
+
+    dish = Dish.objects.get(id=dish_id)
+    user = CustomUser.objects.get(id=user_id)
+
+    if dish.place.order == "false":
+        content = {"error": 'Impossible to make an Order in that Place'}
+        return Response(content, status=status.HTTP_406_NOT_ACCEPTABLE)
+
+    # Calcul du prix total en fonction du plat commandé
+    total_price = dish.price
+
+    if not constituents:
+        # Création de la commande
+        order = Order(user=user, status='En cours', dish=dish, price=total_price)
+        order.save()
+
+        print('order save without constituents')
+
+    else:
+        # Création de la commande
+        order = Order(user=user, status='En cours', dish=dish, price=total_price)
+        order.save()
+        print('order save with constituents 1')
+    # Enregistrement des suppléments du plat commandé et mise à jour du prix total
+        for item in constituents:
+
+            constituent = item['constituent']
+            print('consti',constituent)
+            quantity = item['quantity']
+            print('quantity',quantity)
+            # consti = ConstituentDish.objects.get(id=constituent)
+            try:
+
+                consti = ConstituentDish.objects.get(id=constituent)
+
+            except ConstituentDish.DoesNotExist:
+                content = {"error": "Constituent not found"}
+                return Response(content, status=status.HTTP_404_NOT_FOUND)
+
+            print('consti value',consti)
+            print('order save with constituents 2 ')
+
+            if consti.dish.id != dish.id:
+                content = {"error": "Your constituent is not a constituent of that dish"}
                 return Response(content, status=status.HTTP_406_NOT_ACCEPTABLE)
-            else:
-                print('broo', DishOrder.objects.all())
-                created = DishOrder.objects.filter(order=order, constituent=constit).exists()
-                print('created', created)
 
-                price = constit.price_U * qte
-                order.price = order.price + price
-                order.save()
+            print('order save with constituents 3a ')
+            # dish_order = DishOrder(constituent=consti, qte=quantity, order=order)
+            # dish_order_serializer = DishOrderSerializer(data=item)
+            # if dish_order_serializer.is_valid():
+            #     dish_order_serializer.save()
+            # else:
+            #     content = {"error": dish_order_serializer.errors}
+            #     return Response(content, status=status.HTTP_400_BAD_REQUEST)
+            dish_order = DishOrder()
+            dish_order.order = order
+            dish_order.qte = quantity
+            dish_order.constituent = consti
+            # dish_order.is_valid(raise_exception=True)
+            dish_order.save()
+            print('order save with constituents 3b ')
+            # Ajouter le prix du supplément au prix total de la commande
+            total_price += consti.price_U * quantity
+
+        # Mettre à jour le prix de la commande avec le prix total
+        order.price = total_price
+        order.save()
+        print('order save with constituents 4')
+    content = {"success": "Order Saved"}
+    return Response(content, status=status.HTTP_201_CREATED)
+
+@api_view(['GET'])
+def ListOrderByUser(request, user_id):
+    user = get_object_or_404(CustomUser, id=user_id)
+    orders = Order.objects.filter(user=user)
 
 
+    orders_with_supplements = []
+    for order in orders:
+        dish_orders = DishOrder.objects.filter(order=order)
+        supplements = []
+        for dish_order in dish_orders:
+            item = {"constituent_id": dish_order.constituent.id, "constituent_name": dish_order.constituent.name,
+                    "price": dish_order.constituent.price_U, "qte":dish_order.qte}
+            supplements.append(item)
+
+        # supplements = [dish_order.constituent for dish_order in dish_orders]
+        # print('supplements',supplements)
+        orders_with_supplements.append({'order': OrderSerializer(order).data, 'supplements':  supplements})
 
 
+    print('list order', orders_with_supplements)
+
+    content = {"response": orders_with_supplements}
+    return Response(content, status=status.HTTP_202_ACCEPTED)
+
+    # return orders_with_supplements
 
 
+@api_view(['GET'])
+def UpdateStatusOrder(request, stat, ord):
 
+    try:
+        order = Order.objects.get(id=ord)
+        if stat ==1:
+            sta = "Livre"
+        else:
+            stat = "Annule"
+        order.update_status(sta)
+        content = {"success": "updated!"}
+        return Response(content, status=status.HTTP_202_ACCEPTED)
 
-        except Exception as e:
-            print('exception :', e)
-            content = {"error": "this order or constituent does not exists"}
-            return Response(content, status=status.HTTP_406_NOT_ACCEPTABLE)
-
-
+    except:
+        content = {"error": "This Order does not exists"}
+        return Response(content, status=status.HTTP_202_ACCEPTED)

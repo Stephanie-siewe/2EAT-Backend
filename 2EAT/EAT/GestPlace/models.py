@@ -75,6 +75,10 @@ class Order(models.Model):
     dish = models.ForeignKey(Dish, on_delete=models.SET_NULL, null=True)
     price = models.FloatField(default=0)
 
+    def update_status(self, new_status):
+        self.status = new_status
+        self.save()
+
 
 class DishOrder(models.Model):
     constituent = models.ForeignKey(ConstituentDish, on_delete=models.SET_NULL, null=True)

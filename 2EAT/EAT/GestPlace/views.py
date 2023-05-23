@@ -609,11 +609,13 @@ class ListNotePlace(APIView):
         queryse = Place.objects.all()
         note = []
         for i in queryse:
-            query = PlaceNote.objects.filter(id=i.id)
+            query = PlaceNote.objects.filter(place_id=i.id)
+            print('query',query)
             if len(query) == 0:
                 moy_note = 0
             else:
                 moy_note = sum(obj.note for obj in query)/len(query)
+                print('moy_note',moy_note)
             infos = {"id":i.id, "name":i.name, "moy":moy_note, "quarter":i.localisation.quarter, "city":i.localisation.city, "category":i.category.id}
 
             note.append(infos)

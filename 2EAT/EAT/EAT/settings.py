@@ -140,20 +140,21 @@ DATABASES = {
         'PORT':'3306',
     }
 }
-#connexion bd en ligne
+
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.mysql',
 # 'OPTIONS': {
 #             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
 #         },
-#         'NAME':'bdeattest',
+#        'NAME':'railway',
 #         'USER':'root',
-#         'PASSWORD':'Qq4VhGyTk3B3bLtjE29n',
-#         'HOST': 'containers-us-west-49.railway.app',
-#         'PORT':'5844',
+#         'PASSWORD':'hbDR3i0dunDp91FXwvZN',
+#         'HOST': 'containers-us-west-24.railway.app',
+#          'PORT':'7468',
 #     }
 # }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators

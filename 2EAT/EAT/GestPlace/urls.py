@@ -28,6 +28,7 @@ path('comments/<int:pk>/<int:userid>/like', CommentLikeToggle.as_view()),
 path('comments/<int:pk>/likes-count', CommentLikesCount.as_view()),
 path('noteplace/<int:userid>/<int:pk>/<int:note>', NotePlace.as_view()),
 path('searchplacesbycategory/<int:id>', GetPlacesByCategoryId.as_view()),
+
 path('searchdishesbyplace/<int:id>', GetDishesByPlaceId.as_view()),
 path ('searchconstibydish/<int:id>', GetPlacesByCategoryId.as_view()),
 

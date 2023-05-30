@@ -76,9 +76,25 @@ class ModifyPictureSerializer(serializers.Serializer):
     object_id = serializers.CharField()
 
 
-class CommentSerializer(serializers.ModelSerializer):
+
+class CommentProblemList(serializers.ModelSerializer):
     replies = serializers.SerializerMethodField()
 
+    user = CustomUserSerializer()
+
+    class Meta:
+        model = Comments
+        fields = '__all__'
+
+    def get_replies(self, obj):
+        if obj.replies.exists():
+            return CommentSerializer(obj.replies.all(), many=True).data
+        return None
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    replies = serializers.SerializerMethodField()
+    # user = CustomUserSerializer()
 
     class Meta:
         model = Comments
@@ -92,7 +108,7 @@ class CommentSerializer(serializers.ModelSerializer):
 class CommentLikeSerializer(serializers.ModelSerializer):
 
     user = serializers.PrimaryKeyRelatedField(read_only=True)
-
+    comment = CommentProblemList()
     class Meta:
         model = CommentLike
         fields = '__all__'

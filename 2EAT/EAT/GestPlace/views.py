@@ -4,6 +4,7 @@ import math
 from operator import itemgetter
 from statistics import mean
 
+from django.db.models import Count
 from rest_framework import status, viewsets, generics
 from rest_framework.decorators import api_view
 from rest_framework.generics import get_object_or_404
@@ -519,7 +520,7 @@ class CommentCreate(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 class CommentsList(generics.ListCreateAPIView):
     queryset = Comments.objects.filter(parent__isnull=True)
-    serializer_class = CommentSerializer
+    serializer_class = CommentProblemList
 
 class CommentsDetail(generics.RetrieveAPIView):
     queryset = Comments.objects.all()
@@ -544,7 +545,7 @@ class CommentLikeToggle(APIView):
 
                 likes_count = CommentLike.objects.filter(comment=pk).count()
                 content = {"message": "Like removed", "likes": likes_count}
-                return Response(content, status=status.HTTP_204_NO_CONTENT)
+                return Response(content, status=status.HTTP_200_OK)
             likes_count = CommentLike.objects.filter(comment=pk).count()
             content = {"message": "like added", "likes": likes_count}
 
@@ -566,6 +567,25 @@ class CommentLikesCount(generics.RetrieveAPIView):
             content = {"error": "Comment does not exists"}
             return Response(content, status=status.HTTP_406_NOT_ACCEPTABLE)
 
+
+class GetCommentsByPlaceId(generics.ListAPIView):
+    serializer_class = CommentProblemList
+
+    def get_queryset(self):
+        id = self.kwargs['id']
+        queryset = Comments.objects.filter(place__id=id)
+        return queryset
+
+
+
+class GetUserLikeCommentByUserId(generics.ListAPIView):
+    serializer_class  = CommentLikeSerializer
+
+    def get_queryset(self):
+        id = self.kwargs['id']
+        user_id= self.kwargs['user_id']
+        queryset = CommentLike.objects.filter(comment__id=id,user__id=user_id)
+        return queryset
 
 
 
@@ -851,4 +871,29 @@ def UpdateStatusOrder(request, stat, ord):
 
     except:
         content = {"error": "This Order does not exists"}
+        return Response(content, status=status.HTTP_404_NOT_FOUND)
+
+
+
+@api_view(['GET'])
+def noteplacebyid(request, id):
+
+    try:
+        place = Place.objects.get(id=id)
+        query = PlaceNote.objects.filter(place_id=place.id)
+        print('query', query)
+        if len(query) == 0:
+            moy_note = 0
+        else:
+            moy_note = sum(obj.note for obj in query) / len(query)
+            print('moy_note', moy_note)
+
+        content = {"note": moy_note}
         return Response(content, status=status.HTTP_202_ACCEPTED)
+    except:
+        content = {"error": "This Order does not exists"}
+        return Response(content, status=status.HTTP_404_NOT_FOUND)
+
+
+
+

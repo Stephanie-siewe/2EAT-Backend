@@ -621,6 +621,18 @@ class NotePlace(APIView):
             content = {"error": "this user or this place does not exists"}
             return Response(content, status=status.HTTP_406_NOT_ACCEPTABLE)
 
+class VerifyIfUserHadNotePlace(APIView):
+
+    def get(self, request, userid, placeid):
+        # userid = self.kwargs['userid']
+        # placeid = self.kwargs['placeid']
+        query = PlaceNote.objects.get(place__id=placeid, user__id=userid)
+        if not query:
+            response = False
+        else:
+            response = True
+        content = {"response": response}
+        return Response(content, status=status.HTTP_200_OK)
 
 class ListNotePlace(APIView):
 
